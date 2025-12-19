@@ -5,7 +5,7 @@ import ChatInterface from './components/chat/ChatInterface';
 import CouncilView from './components/council/CouncilView';
 import { api } from './api/apiService';
 import { Menu } from 'lucide-react';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer, toast, Zoom } from 'react-toastify';
 
 function App() {
   const [conversations, setConversations] = useState([]);
@@ -56,42 +56,47 @@ function App() {
     }
   };
 
-  const handleDeleteConversation = async (e, id) => {
+  const handleDeleteConversation = (e, id) => {
     e.stopPropagation();
 
-    // Custom toast confirmation
-    const confirmDelete = () => {
-      toast.dismiss();
-      performDelete(id);
-    };
+    // Dismiss any existing toasts
+    toast.dismiss();
 
-    const cancelDelete = () => {
-      toast.dismiss();
-    };
-
-    toast.warn(
-      <div className="flex flex-col gap-1.5">
-        <p className="font-semibold text-[11px] leading-tight">Delete Chat?</p>
-        <div className="flex gap-1.5 pt-0.5">
+    toast(
+      <div className="bg-white p-4 rounded-xl shadow-xl border border-slate-200 flex flex-col gap-3 min-w-[240px] pointer-events-auto">
+        <div className="flex flex-col gap-1">
+          <h3 className="font-semibold text-sm text-slate-800">Delete Conversation?</h3>
+          <p className="text-xs text-slate-500">This action cannot be undone.</p>
+        </div>
+        <div className="flex gap-2 justify-end mt-1">
           <button
-            onClick={confirmDelete}
-            className="flex-1 bg-white/20 hover:bg-white/30 px-2 py-0.5 rounded text-[10px] font-medium transition-all"
-          >
-            Delete
-          </button>
-          <button
-            onClick={cancelDelete}
-            className="flex-1 bg-white/90 hover:bg-white text-slate-700 px-2 py-0.5 rounded text-[10px] font-medium transition-all"
+            onClick={(e) => {
+              e.stopPropagation();
+              toast.dismiss();
+            }}
+            className="px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 rounded-md transition-colors border border-slate-200"
           >
             Cancel
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              performDelete(id);
+              toast.dismiss();
+            }}
+            className="px-3 py-1.5 text-xs font-medium text-white bg-red-500 hover:bg-red-600 rounded-md shadow-sm transition-colors"
+          >
+            Delete
           </button>
         </div>
       </div>,
       {
-        autoClose: false,
         closeButton: false,
-        draggable: false,
-        icon: false, // Too small for icon
+        icon: false,
+        autoClose: false,
+        hideProgressBar: true,
+        transition: Zoom,
+        className: "!bg-transparent !p-0 !shadow-none !border-0"
       }
     );
   };
@@ -166,20 +171,22 @@ function App() {
         )}
       </AnimatePresence>
 
-      {/* Toast Container */}
+      {/* Toast Container - Centered for better visibility of alerts */}
       <ToastContainer
-        position="top-right"
-        autoClose={2000}
+        position="top-center"
+        autoClose={3000}
         hideProgressBar={false}
         newestOnTop={true}
-        closeOnClick={true}
+        closeOnClick={false}
         rtl={false}
         pauseOnFocusLoss={false}
         draggable={true}
         pauseOnHover={true}
         theme="light"
-        limit={3}
-        style={{ marginTop: '12px', marginRight: '12px' }}
+        limit={1}
+        style={{ width: "auto" }}
+        toastClassName="!rounded-xl !shadow-none !p-0 !bg-transparent"
+        bodyClassName="!p-0 !m-0"
       />
     </div>
   );
