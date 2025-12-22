@@ -64,26 +64,25 @@ export const api = {
         }
 
         const formData = new FormData();
-        formData.append('content', content);
+        formData.append('query', content); // Backend expects 'query', not 'content'
         if (file) {
             formData.append('file', file);
         }
 
-        // The user's prompt said:
-        // POST api/conversations/{conversation_id} for hitting the backend.
-        // The backend code supplied shows: POST /api/conversations/{conversation_id}/message
-        // I will use that.
-        // However, for file upload, the python code supplied does NOT show file handling in `SendMessageRequest`.
-        // It only shows `content: str`.
-        // The user request SAID: "The input is query and the UploadFile"
-        // But the PROVIDED CODE in the prompt (FastAPI) DOES NOT HAVE UploadFile support in `send_message`.
-        // I must stick to the python code provided if I want it to work with *that* backend, 
-        // BUT the user said "make the website... I have provided council code for reference".
-        // I will implement standard JSON post for text. If I add file upload, I'll need to assume the backend *will* change or I just mock it.
-        // I'll assume JSON for now as per the python code `SendMessageRequest`.
+        // Backend endpoint is /api/conversations (POST) which takes query + file + header
+        const res = await axios.post(`${API_BASE}/conversations`, formData, {
+            headers: {
+                'conversation_id': conversationId,
+                'Content-Type': 'multipart/form-data'
+            }
+        });
 
-        const res = await axios.post(`${API_BASE}/conversations/${conversationId}/message`, { content });
-        return res.data;
+        // The backend returns { conversation_id, prompt, council_response, ... }
+        // We need to map this to what the UI expects: { response: string, ...council_data }
+        return {
+            response: res.data.prompt ? `Processed: ${res.data.prompt}` : "Processing complete.", // or some message from backend
+            ...res.data // everything else matches council data structure hopefully
+        };
     },
 
     deleteConversation: async (id) => {

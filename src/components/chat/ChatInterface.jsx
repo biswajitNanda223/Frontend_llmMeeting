@@ -27,7 +27,7 @@ const ChatInterface = ({ conversationId, messages, setMessages, onViewCouncil })
             id: `temp_${Date.now()}`,
             role: 'user',
             content: input,
-            file: selectedFile // visual only for now
+            file: selectedFile
         };
 
         setMessages(prev => [...prev, userMsg]);

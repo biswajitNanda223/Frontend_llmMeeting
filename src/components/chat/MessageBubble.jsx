@@ -39,6 +39,7 @@ const MessageBubble = ({ message, onViewCouncil }) => {
                     {isBot ? <Bot size={14} /> : <User size={14} />}
                 </div>
 
+
                 {/* Message Content */}
                 <div className="flex flex-col gap-1 min-w-0">
                     {/* Main Bubble */}
@@ -50,6 +51,18 @@ const MessageBubble = ({ message, onViewCouncil }) => {
                                 : "bg-blue-500 text-white border-blue-600 rounded-tr-none shadow-blue-500/10"
                         )}
                     >
+                        {/* File Attachment Indicator */}
+                        {message.file && (
+                            <div className={clsx(
+                                "flex items-center gap-2 mb-2 p-2 rounded-lg text-xs font-medium border",
+                                isBot
+                                    ? "bg-slate-50 border-slate-100 text-slate-600"
+                                    : "bg-blue-600/30 border-blue-500/30 text-white"
+                            )}>
+                                <FileText size={14} />
+                                <span className="truncate max-w-[160px]">{message.file.name}</span>
+                            </div>
+                        )}
                         <div className="prose prose-sm max-w-none">
                             {message.content.split('\n').map((line, i) => (
                                 <p key={i} className="mb-1 last:mb-0">{line}</p>
